@@ -9,10 +9,10 @@ const { Server } = require("socket.io");
 
 const app = express();
 
-app.use(cors({origin:'http://localhost'}));
+app.use(cors({origin:'*'}));
 app.use(bodyParser.json())
 
-app.set('PORT', process.env.PORT || 3000);
+app.set('PORT', 3000);
 
 const server = https.createServer(app);
 const io = new Server(server, {
