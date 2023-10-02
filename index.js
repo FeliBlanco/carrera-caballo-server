@@ -79,12 +79,16 @@ io.on('connection', (socket) => {
         if(data.position >= 93) {
             infoJuego.puesto ++;
             if(infoJuego.jugadores[data.user]) {
-                io.emit("ganador", {user: infoJuego.jugadores[data.user], puesto: infoJuego.puesto})
+                io.emit("ganador", {user: infoJuego.jugadores[data.user], puesto: infoJuego.puesto, tiempo: getTiempo(infoJuego.segundos)})
             }
             if(puesto == 2) {
                 //resetearJuego()
                 infoJuego.puedenmover = false;
                 io.emit('actualizarjuego', infoJuego)
+
+                setTimeout(() => {
+                    resetearJuego()
+                }, 1000 * 5)
             }
         } else {
             io.emit('movercaballo', data)
@@ -191,13 +195,8 @@ const iniciarConteo = () => {
             }
 
             contador = setInterval(() => {
-                let segundos = infoJuego.segundos;
                 infoJuego.segundos += 1;
-                let minutos = Math.floor(segundos / 60);
-                segundos -= (minutos * 60);
-
-                let final = `${minutos}:${segundos}`
-                io.emit('contador', final);
+                io.emit('contador', getTiempo(infoJuego.segundos));
             }, 1000)
         } else {
             infoJuego.conteo = infoJuego.conteo - 1;
@@ -219,3 +218,10 @@ const verificarJuego = () => {
 server.listen(app.get('PORT'), () => {
     console.log(`Servidor abierto en puerto ${app.get('PORT')}`);
 })
+
+const getTiempo = (segundos) => {
+    let minutos = Math.floor(segundos / 60);
+    segundos -= (minutos * 60);
+
+    return `${minutos}:${segundos}`
+}
