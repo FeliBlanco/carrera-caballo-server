@@ -81,7 +81,7 @@ io.on('connection', (socket) => {
             if(infoJuego.jugadores[data.user]) {
                 io.emit("ganador", {user: infoJuego.jugadores[data.user], puesto: infoJuego.puesto, tiempo: getTiempo(infoJuego.segundos)})
             }
-            if(puesto == 2) {
+            if(infoJuego.puesto == 2) {
                 //resetearJuego()
                 infoJuego.puedenmover = false;
                 io.emit('actualizarjuego', infoJuego)
