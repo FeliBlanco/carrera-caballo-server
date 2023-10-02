@@ -1,7 +1,7 @@
 const express = require('express')
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { createServer } = require('node:http');
+const { createServer } = require('node:https');
 const https = require('https')
 
 const { Server } = require("socket.io");
@@ -14,7 +14,7 @@ app.use(bodyParser.json())
 
 app.set('PORT', 3000);
 
-const server = https.createServer(app);
+const server = createServer(app);
 const io = new Server(server, {
     cors: {
         origin: '*',
