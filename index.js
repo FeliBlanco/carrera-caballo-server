@@ -44,8 +44,11 @@ let infoJuego = {
     puesto: 0,
     cantidadCaballos: 3,
     puedenmover: false,
-    segundos: 0
+    segundos: 0,
+    resetear:5
 }
+
+let resetInterval = null;
 
 let contador = null;
 
@@ -57,7 +60,8 @@ const resetearJuego = () => {
         puesto: 0,
         cantidadCaballos: 3,
         puedenmover: false,
-        segundos: 0
+        segundos: 0,
+        resetear: 5
     }
 
     jugadores = [-1, -1, -1]
@@ -86,9 +90,18 @@ io.on('connection', (socket) => {
                 infoJuego.puedenmover = false;
                 io.emit('actualizarjuego', infoJuego)
 
-                setTimeout(() => {
-                    resetearJuego()
-                }, 1000 * 5)
+                if(resetInterval != null) clearInterval(resetInterval)
+
+                resetInterval = setInterval(() => {
+                    infoJuego.resetear -= 1;
+                    if(infoJuego.resetear <= 0) {
+                        resetearJuego()
+                        clearInterval(resetInterval)
+                        resetInterval = null;
+                    } else {
+                        io.emit('resetcontador', infoJuego.resetear)
+                    }
+                }, 1000)
             }
         } else {
             io.emit('movercaballo', data)
