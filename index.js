@@ -40,6 +40,8 @@ const io = new Server(server, {
 
 /* CONFIGURACION */
 
+const CANTIDAD_JUGADORES = 3;
+
 let jugadores = [-1, -1, -1]
 
 let infoJuego = {
@@ -76,7 +78,7 @@ io.on('connection', (socket) => {
                 // SOCKET: ANUNCIA EL GANADOR
                 io.emit("ganador", {user: infoJuego.jugadores[data.user], puesto: infoJuego.puesto, tiempo: getTiempo(infoJuego.segundos)})
             }
-            if(infoJuego.puesto == 2) {
+            if(infoJuego.puesto == 2 || infoJuego.jugadores.every(i => i.conectado == false || i.termino == true)) {
                 // YA HAY 2 GANADORES, INICIA CONTADOR PARA RESETEAR JUEGO
                 //resetearJuego()
                 infoJuego.puedenmover = false;
@@ -158,7 +160,7 @@ app.post('/unirse', (req, res) => {
         }
     }
 
-    if(jugadorid == -1 || infoJuego.jugadores.length >= 3) return res.send({code: 2})
+    if(jugadorid == -1 || infoJuego.jugadores.length >= CANTIDAD_JUGADORES) return res.send({code: 2})
 
     const buscarNombre = infoJuego.jugadores.findIndex(i => i.username.toLowerCase() == username.toLowerCase());
     if(buscarNombre != -1) return res.send({code: 3});
@@ -182,7 +184,7 @@ app.post('/unirse', (req, res) => {
     io.emit('nuevojugador', infouser)
 
     // SI YA HAY 3 JUGADORES ANOTADOS COMIENZA EL JUEGO
-    if(infoJuego.jugadores.length >= 3) {
+    if(infoJuego.jugadores.length >= CANTIDAD_JUGADORES) {
         comenzarJuego();
     }
 
@@ -204,7 +206,11 @@ const resetearJuego = () => {
         resetear: 5
     }
 
-    jugadores = [-1, -1, -1]
+    jugadores = []
+    for(let i = 0; i < CANTIDAD_JUGADORES; i++) {
+        jugadores[i] = -1;
+    }
+
     io.emit('resetjuego', infoJuego)
 
     if(contador != null) {
@@ -253,7 +259,7 @@ const iniciarConteo = () => {
 }
 
 const verificarJuego = () => {
-    if(infoJuego.jugadores.every(i => i.conectado == false)) {
+    if(infoJuego.jugadores.every(i => i.conectado == false) || infoJuego.jugadores.every(i => (i.conectado == false || i.termino == true))) {
         console.log("SE RESETEA EL JUEGO")
         resetearJuego()
     }
