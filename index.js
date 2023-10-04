@@ -20,6 +20,7 @@ app.set('PORT', 2087);
 const privateKey = fs.readFileSync('/var/www/getyn.com.ar/certs/key.pem');
 const certificate = fs.readFileSync('/var/www/getyn.com.ar/certs/cert.pem');
 
+
 const credentials = {
 	key: privateKey,
 	cert: certificate,
